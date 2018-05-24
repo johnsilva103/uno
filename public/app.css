@@ -1,13 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Raleway:30);
 @import url(https://cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-flash.min.css);
-@import url(https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css);
 
-button[data-v-36fcbec0] {
-  outline: none;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-}
 .card[data-v-36fcbec0] {
   cursor: pointer;
   transition: 0.25s ease-in;
@@ -16,16 +9,11 @@ button[data-v-36fcbec0] {
     opacity: 0.9;
     transform: scale(1.05);
 }
-@keyframes fade-in-data-v-36fcbec0 {
-from {
-    opacity: 0;
+.fade-enter-active[data-v-36fcbec0], .fade-leave-active[data-v-36fcbec0] {
+  transition: opacity .5s;
 }
-to {
-    opacity: 1;
-}
-}
-.fade-in[data-v-36fcbec0] {
-  animation: fade-in-data-v-36fcbec0 1.5s;
+.fade-enter[data-v-36fcbec0], .fade-leave-to[data-v-36fcbec0] {
+  opacity: 0;
 }
 
 @charset "UTF-8";

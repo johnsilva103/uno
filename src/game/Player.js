@@ -18,6 +18,11 @@ class Player {
 		data.players.delete(this.id);
 	}
 
+	setGame(game) {
+		this.game = game;
+		this.send({ op: "setGame", game });
+	}
+
 	send(info) {
 		this.wsClient.send(info);
 	}
@@ -29,7 +34,6 @@ class Player {
 	toJSON() {
 		return {
 			id: this.id,
-			hand: this.hand,
 			nickname: this.nickname
 		};
 	}

@@ -13,11 +13,10 @@ server.on("connection", client => {
 
 	client.on("message", message => handleMessage(client, message));
 	client.on("close", () => {
-		if(client.game) handleMessage(client, { op: "leave" });
+		if(client.player.game) handleMessage(client, { op: "leave" });
 	});
 
 	client.player = new Player(client);
-	client.player.update();
 });
 
 server.broadcast = data => server.clients.forEach(client => {

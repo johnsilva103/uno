@@ -1,8 +1,9 @@
+const data = require("./game/data");
 const Game = require("./game/Game");
 
 const handlers = {
 	nickname(client, { nickname }) {
-		if(typeof nickname !== "string" || nickname.length < 2 || nickname.length > 16) {
+		if(typeof nickname !== "string" || nickname.length < 2 || nickname.length > 32) {
 			client.send({ op: "error", error: "Invalid nickname" });
 			return;
 		}
@@ -11,31 +12,41 @@ const handlers = {
 		client.player.update();
 	},
 	createGame(client, { name, password }) {
-		if(client.game) {
+		if(client.player.game) {
 			client.send({ op: "error", error: "Can't create a game; already in one" });
 			return;
 		}
 
-		const game = new Game(client.server, client.player, name, password);
-		client.game = game;
-
-		client.send({ op: "setGame", game });
+		new Game(client.server, client.player, name, password); // eslint-disable-line no-new
 	},
 	leave(client) {
-		if(client.game.host.id === client.player.id) {
-			handlers.deleteGame(client);
-			return;
-		} else {
-			client.send({ op: "leave", id: client.game.id });
-		}
+		if(client.player.game.host.id === client.player.id) handlers.deleteGame(client);
+		else client.send({ op: "leave", id: client.player.game.id });
 	},
 	deleteGame(client) {
-		if(client.game.host.id !== client.player.id) {
+		if(client.player.game.host.id !== client.player.id) {
 			client.send({ op: "error", error: "Cannot delete a game if not hosting any" });
-			return;
+		} else {
+			client.player.game.delete();
 		}
-
-		client.game.delete();
+	},
+	getGames(client) {
+		return client.send({
+			op: "gameList",
+			games: [...data.games.values()].filter(game => !game.started)
+		});
+	},
+	joinGame(client, { id, password }) {
+		const game = data.games.get(id);
+		if(!game) {
+			client.send({ op: "error", error: `Invalid game id: ${id}` });
+		} else if(!password && game.password) {
+			client.send({ op: "error", error: "No password given for a password-protected game" });
+		} else if(game.password && !game.checkPassword(password)) {
+			client.send({ op: "wrongPassword" });
+		} else {
+			game.join(client.player);
+		}
 	}
 };
 

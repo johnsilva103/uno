@@ -22,7 +22,11 @@ class Game {
 		this.color = null;
 
 		data.games.set(this.id, this);
-		this.update();
+		this.join(this.host);
+	}
+
+	checkPassword(guess) {
+		return crypto.createHash("sha512").update(guess).digest("hex") === this.password;
 	}
 
 	reverse() {
@@ -66,8 +70,8 @@ class Game {
 
 	join(player) {
 		this.players.set(player.id, player);
-		player.game = this;
 
+		player.setGame(this);
 		this.update();
 	}
 
@@ -101,7 +105,7 @@ class Game {
 			info.players = [...this.players.values()].map(player => ({
 				id: player.id,
 				nickname: player.nickname,
-				cards: player.hand.size
+				cardsLeft: player.hand.size
 			}));
 
 			info.direction = this.direction;
@@ -113,10 +117,7 @@ class Game {
 			info.drawStack = this.drawStack;
 			info.category = this.category;
 		} else {
-			info.players = [...this.players.values()].map(player => ({
-				id: player.id,
-				nickname: player.nickname
-			}));
+			info.players = [...this.players.values()];
 		}
 
 		return info;

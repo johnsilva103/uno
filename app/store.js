@@ -1,5 +1,6 @@
 module.exports = {
 	games: [],
-	self: {},
-	gameData: {}
+	self: { nickname: localStorage.nickname },
+	gameData: null,
+	errors: {}
 };

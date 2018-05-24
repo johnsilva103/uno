@@ -17,14 +17,14 @@ const handlers = {
 	},
 	deleteGame({ id }) {
 		if(store.gameData && store.gameData.id === id) {
-			store.gameData = {};
+			store.gameData = null;
 
 			app.$router.push({ name: "home" });
 		} else if(!store.gameData) {
 			const index = store.games.findIndex(game => game.id === id);
 
 			if(!~index) return;
-			else store.splice(index, 1);
+			else store.games.splice(index, 1);
 		}
 	},
 	playStatus({ status }) {
@@ -40,12 +40,18 @@ const handlers = {
 	},
 	leave({ id }) {
 		if(!store.gameData || store.gameData.id !== id) return;
-		store.gameData = {};
+		store.gameData = null;
 
 		app.$router.push({ name: "home" });
 	},
+	wrongPassword() {
+		app.$set(store.errors, "incorrectPassword", true);
+	},
 	error({ error }) {
 		console.error(error);
+	},
+	gameList({ games }) {
+		store.games.splice(0, store.games.length, ...games);
 	}
 };
 
