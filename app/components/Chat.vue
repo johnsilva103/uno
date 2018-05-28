@@ -5,8 +5,8 @@
 			<i
 				class="fa float-right"
 				:class="{
-					'fa-volume-up': localStorage.messageSound !== false,
-					'fa-volume-off': localStorage.messageSound === false
+					'fa-volume-up': messageSound !== false,
+					'fa-volume-off': messageSound === false
 				}"
 				@click="toggleSound()"
 				aria-hidden="true"
@@ -24,6 +24,9 @@
 <script>
 module.exports = {
 	props: ["chat", "height"],
+	data() {
+		return { messageSound: !!localStorage.messageSound };
+	},
 	created() {
 		this.$nextTick(() => {
 			const [container] = $(".chat-container").get();
@@ -32,7 +35,7 @@ module.exports = {
 	},
 	watch: {
 		chat() {
-			if(localStorage.messageSound !== false) new Audio("/audio/message.mp3").play();
+			if(this.messageSound) new Audio("/audio/message.mp3").play();
 
 			const [container] = $(".chat-container").get();
 			if(container.scrollTop + container.clientHeight === container.scrollHeight) {
@@ -49,7 +52,8 @@ module.exports = {
 			target.val("");
 		},
 		toggleSound() {
-			localStorage.messageSound = !localStorage.messageSound;
+			this.messageSound = !this.messageSound;
+			localStorage.messageSound = this.messageSound;
 		}
 	}
 };
