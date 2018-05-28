@@ -109,7 +109,7 @@ const handlers = {
 				error: "Cannot join a game that already started"
 			});
 		} else {
-			client.player.game.chat(`${client.player.nickname} joined the lobby`);
+			game.chat(`${client.player.nickname} joined the lobby`);
 			game.join(client.player);
 		}
 	},
