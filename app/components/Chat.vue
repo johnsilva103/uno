@@ -1,16 +1,15 @@
 <template>
 	<div class="jumbotron jumbotron-fluid rounded px-0 py-3 mt-3">
 		<div class="container">
-			<h4>Live Chat</h4>
-			<i
-				class="fa float-right"
+			<button class="btn float-right" type="button" @click="toggleSound()">
+				<i class="fa float-right"
 				:class="{
 					'fa-volume-up': messageSound,
 					'fa-volume-off': !messageSound
 				}"
-				@click="toggleSound()"
-				aria-hidden="true"
-			></i>
+				aria-hidden="true"></i>
+			</button>
+			<h4>Live Chat</h4>
 		</div>
 		<div class="container chat-container" :style="`height:${height || 300}px`">
 			<message v-for="(message, i) in chat" :key="i" :message="message" />
