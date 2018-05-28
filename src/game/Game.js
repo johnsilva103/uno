@@ -56,9 +56,12 @@ class Game {
 	}
 
 	nextTurn(add = 1) {
-		if(this.players.has(this.turn) &&
+		if(
+			this.players.has(this.turn) &&
 			this.players.get(this.turn).hand &&
-			this.players.get(this.turn).hand.size === 0) {
+			this.players.get(this.turn).hand.size === 0
+		) {
+			this.chat(`${this.players.get(this.turn).nickname} won the game!`);
 			this.finish();
 			return;
 		}

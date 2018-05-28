@@ -15,13 +15,10 @@ class Card {
 	}
 
 	get readableName() {
-		return (this.category !== "other" ?
-			`${this.category.charAt(0).toUpperCase() + this.category.substring(1)} ` :
-			"") +
-			this.name.charAt(0).toUpperCase() +
+		return (this.category !== "other" ? this.category : "") +
 			(~this.name.indexOf("-") ?
-				`${this.name.substring(1, this.name.indexOf("-"))} ${this.name.substring(this.name.indexOf("-") + 1)}` :
-				this.name.substring(1));
+				`${this.name.substring(0, this.name.indexOf("-"))} ${this.name.substring(this.name.indexOf("-") + 1)}` :
+				this.name.substring(0));
 	}
 
 	play() {

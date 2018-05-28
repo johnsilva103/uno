@@ -6,11 +6,13 @@
 			</div>
 			<div class="col-sm-12 col-md-9">
 				<div class="container face" style="height:200px">
-					<card v-for="(card, i) in gameData.faceHistory.concat(gameData.face || { category: 'other', name: 'back' })"
+					<card v-for="(card, i) in gameData.faceHistory"
 						:key="i"
 						:card="card"
 						:rotation="-20 + ((i % 4) * 10)"
 					/>
+
+					<card :card="gameData.face || { category: 'other', name: 'back' }" :selectedColor="gameData.selectedColor" />
 				</div>
 				<div class="container hand mt-5" style="height:250px">
 					<card v-for="(card, i) in self.hand"
@@ -78,9 +80,6 @@ module.exports = {
 	watch: {
 		"self.playStatus": function(newValue) {
 			if(newValue === "PICK") $("#chooseColor").modal("show");
-		},
-		"gameData.selectedColor": function(color) {
-			this.gameData.face.name += `-${color}`;
 		},
 		"gameData.turn": function(newTurn) {
 			if(newTurn !== this.self.id) return;
