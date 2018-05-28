@@ -12,6 +12,10 @@ const handlers = {
 			return;
 		}
 
+		if(client.player.game) {
+			client.player.game.chat(`${client.player.nickname} changed nickname to ${nickname}`);
+		}
+
 		client.player.setNickname(nickname);
 	},
 	createGame(client, { name, password }) {
@@ -35,6 +39,7 @@ const handlers = {
 		} else if(client.player.game.host.id === client.player.id) {
 			handlers.deleteGame(client);
 		} else {
+			client.player.game.chat(`${client.player.nickname} left the game`);
 			client.player.game.leave(client.player);
 		}
 	},
@@ -91,6 +96,12 @@ const handlers = {
 				errorOP: ["joinGame", "incorrectPassword"],
 				error: "Incorrect password"
 			});
+		} else if(game.players.size >= 10) {
+			client.send({
+				op: "error",
+				errorOP: ["joinGame", "tooManyPlayers"],
+				error: "Game already has maximum amount of players (10)"
+			});
 		} else if(game.started) {
 			client.send({
 				op: "error",
@@ -98,6 +109,7 @@ const handlers = {
 				error: "Cannot join a game that already started"
 			});
 		} else {
+			client.player.game.chat(`${client.player.nickname} joined the lobby`);
 			game.join(client.player);
 		}
 	},
@@ -144,6 +156,7 @@ const handlers = {
 				error: "Cannot start a game with less than 2 players"
 			});
 		} else {
+			client.player.game.chat("Game started!");
 			client.player.game.start();
 		}
 	},
@@ -216,13 +229,15 @@ const handlers = {
 				client.send({
 					op: "error",
 					errorOP: ["endTurn", "notWildCard"],
-					error: "Cannot set color -- a wild card was not played"
+					error: "Cannot set color; a wild card was not played"
 				});
 			} else {
+				client.player.game.chat(`${client.player.nickname} selected ${color}`);
 				client.player.game.selectedColor = color;
 				client.player.game.nextTurn();
 			}
 		} else if(client.player.game.drawStack) {
+			client.player.game.chat(`${client.player.nickname} drew ${client.player.game.drawStack} cards`);
 			client.player.game.emptyDrawStack();
 		} else {
 			client.send({
@@ -258,6 +273,7 @@ const handlers = {
 				error: "You cannot draw unless none of your cards are playable"
 			});
 		} else {
+			client.player.game.chat(`${client.player.nickname} drew a card`);
 			client.player.hand.draw();
 			client.player.game.nextTurn();
 		}

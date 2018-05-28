@@ -56,7 +56,9 @@ class Game {
 	}
 
 	nextTurn(add = 1) {
-		if(this.players.has(this.turn) && this.players.get(this.turn).hand.size === 0) {
+		if(this.players.has(this.turn) &&
+			this.players.get(this.turn).hand &&
+			this.players.get(this.turn).hand.size === 0) {
 			this.finish();
 			return;
 		}
@@ -137,7 +139,7 @@ class Game {
 		this.nextTurn();
 	}
 
-	chat(content, player) {
+	chat(content, player = "system") {
 		this.broadcast({ op: "chat", message: { content, player } });
 	}
 

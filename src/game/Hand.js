@@ -25,6 +25,7 @@ class Hand {
 		const status = card.play();
 		if(status !== "PICK") this.game.selectedColor = null;
 
+		this.game.chat(`${this.player.nickname} played ${card.readableName}`);
 		this.player.send({ op: "playStatus", status });
 		this.update();
 	}

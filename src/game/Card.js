@@ -7,12 +7,21 @@ class Card {
 	}
 
 	get playable() {
-		return !!(this.game.drawStack ? ~this.name.indexOf("draw") :
-			!this.game.face ||
+		return !this.game.face ||
 			this.category === "other" ||
 			this.game.face.category === this.category ||
 			(this.game.face.category === "other" && this.game.selectedColor === this.category) ||
-			this.game.face.name === this.name);
+			this.game.face.name === this.name;
+	}
+
+	get readableName() {
+		return (this.category !== "other" ?
+			`${this.category.charAt(0).toUpperCase() + this.category.substring(1)} ` :
+			"") +
+			this.name.charAt(0).toUpperCase() +
+			(~this.name.indexOf("-") ?
+				`${this.name.substring(1, this.name.indexOf("-"))} ${this.name.substring(this.name.indexOf("-") + 1)}` :
+				this.name.substring(1));
 	}
 
 	play() {

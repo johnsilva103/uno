@@ -24,7 +24,7 @@
 				</div>
 				<div class="container text-center">
 					<div class="btn-group" role="group">
-						<button type="button" class="btn btn-primary" @click="draw()" :disabled="!gameData.drawStack && self.hand.some(card => card.playable)">Draw Card</button>
+						<button type="button" class="btn btn-primary" @click="draw()" :disabled="gameData.drawStack || gameData.turn !== self.id || self.hand.some(card => card.playable)">Draw Card</button>
 					</div>
 				</div>
 				<chat :chat="gameData.chat" />

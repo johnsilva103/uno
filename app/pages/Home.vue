@@ -151,7 +151,8 @@ module.exports = {
 			ws.send({ op: "createGame", name: this.gameOptions.name, password: this.gameOptions.password });
 		},
 		joinGame(game) {
-			if(!game) game = this.password.game;
+			if(game.players.length >= 10) return;
+			else if(!game) game = this.password.game;
 
 			if(game.password && (!this.password.game || this.password.game.id !== game.id)) {
 				this.password = {
