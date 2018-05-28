@@ -15,6 +15,10 @@
 <script>
 module.exports = {
 	props: ["chat", "height"],
+	created() {
+		const [container] = $(".chat-container").get();
+		this.$nextTick(() => container.scrollTop = container.scrollHeight);
+	},
 	watch: {
 		chat() {
 			const [container] = $(".chat-container").get();
