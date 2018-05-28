@@ -106,4 +106,12 @@ ws.onmessage = ({ data: message }) => {
 	handlers[message.op](message);
 };
 
+ws.onclose = () => {
+	$("#warning .modal-title").text("Disconnected");
+	$("#warning .modal-body").text("Disconnected from server. Reloading page.");
+	$("#warning").modal("show");
+
+	setTimeout(window.location.reload, 2500);
+};
+
 module.exports = ws;
