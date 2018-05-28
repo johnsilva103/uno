@@ -47,6 +47,8 @@ module.exports = {
 			if(event.shiftKey) return;
 
 			const target = $(event.target);
+			if(!target.val().trim()) return;
+
 			ws.send({ op: "chat", content: target.val() });
 			target.val("");
 		},
