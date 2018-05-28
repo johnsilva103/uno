@@ -1,7 +1,16 @@
 <template>
 	<div class="jumbotron jumbotron-fluid rounded px-0 py-3 mt-3">
 		<div class="container">
-			 <h4>Live Chat</h4>
+			<h4>Live Chat</h4>
+			<i
+				class="fa float-right"
+				:class="{
+					'fa-volume-up': localStorage.messageSound !== false,
+					'fa-volume-off': localStorage.messageSound === false
+				}"
+				@click="toggleSound()"
+				aria-hidden="true"
+			></i>
 		</div>
 		<div class="container chat-container" :style="`height:${height || 300}px`">
 			<message v-for="(message, i) in chat" :key="i" :message="message" />
@@ -23,6 +32,8 @@ module.exports = {
 	},
 	watch: {
 		chat() {
+			if(localStorage.messageSound !== false) new Audio("/audio/message.mp3").play();
+
 			const [container] = $(".chat-container").get();
 			if(container.scrollTop + container.clientHeight === container.scrollHeight) {
 				this.$nextTick(() => container.scrollTop = container.scrollHeight);
@@ -36,6 +47,9 @@ module.exports = {
 			const target = $(event.target);
 			ws.send({ op: "chat", content: target.val() });
 			target.val("");
+		},
+		toggleSound() {
+			localStorage.messageSound = !localStorage.messageSound;
 		}
 	}
 };
