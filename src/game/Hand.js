@@ -10,6 +10,10 @@ class Hand {
 		return this.cards.length;
 	}
 
+	findCard(category, name) {
+		return this.cards.find(card => card.category === category && card.name === name);
+	}
+
 	empty() {
 		this.cards.forEach(card => this.game.deck.discard(card));
 	}
@@ -17,8 +21,9 @@ class Hand {
 	play(card) {
 		if(!card.playable) throw new Error("Card not playable");
 
-		this.splice(this.cards.indexOf(card), 1);
+		this.cards.splice(this.cards.indexOf(card), 1);
 		const status = card.play();
+		if(status !== "PICK") this.game.selectedColor = null;
 
 		this.player.send({ op: "playStatus", status });
 		this.update();
@@ -30,10 +35,8 @@ class Hand {
 		this.update();
 	}
 
-	draw() {
-		this.addCards(this.game.deck.draw());
-
-		this.update();
+	draw(count) {
+		this.addCards(this.game.deck.draw(count));
 	}
 
 	update(extra) {
@@ -41,11 +44,7 @@ class Hand {
 	}
 
 	toJSON() {
-		return this.cards.map(card => ({
-			playable: this.playable,
-			category: this.category,
-			name: this.name
-		}));
+		return this.cards;
 	}
 }
 

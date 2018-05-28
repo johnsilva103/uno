@@ -7,7 +7,12 @@ class Card {
 	}
 
 	get playable() {
-		return this.category === "other" || this.game.face.category === this.category || this.game.face.name === this.name;
+		return !!(this.game.drawStack ? ~this.name.indexOf("draw") :
+			!this.game.face ||
+			this.category === "other" ||
+			this.game.face.category === this.category ||
+			(this.game.face.category === "other" && this.game.selectedColor === this.category) ||
+			this.game.face.name === this.name);
 	}
 
 	play() {
@@ -31,7 +36,7 @@ class Card {
 			}
 
 			case "draw-4": {
-				this.game.drawStack += 2;
+				this.game.drawStack += 4;
 			}
 		}
 
@@ -46,6 +51,14 @@ class Card {
 			this.game.nextTurn();
 			return "OK";
 		}
+	}
+
+	toJSON() {
+		return {
+			playable: this.playable,
+			category: this.category,
+			name: this.name
+		};
 	}
 }
 

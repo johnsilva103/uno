@@ -13,16 +13,32 @@ class Game {
 		this.id = SnowflakeGenerator.next();
 		this.players = new Map();
 		this.deck = new Deck(this);
-		this.started = false;
 
+		this.started = false;
+		this.selectedColor = null;
 		this.direction = 1;
 		this.turn = null;
 		this.face = null;
 		this.drawStack = 0;
-		this.color = null;
+		this.faceHistory = [];
 
 		data.games.set(this.id, this);
 		this.join(this.host);
+	}
+
+	finish() {
+		this.deck.reset();
+		[...this.players.values()].forEach(player => player.hand = null);
+
+		this.started = false;
+		this.selectedColor = null;
+		this.direction = 1;
+		this.turn = null;
+		this.face = null;
+		this.drawStack = 0;
+		this.faceHistory = [];
+
+		this.update();
 	}
 
 	checkPassword(guess) {
@@ -40,12 +56,19 @@ class Game {
 	}
 
 	nextTurn(add = 1) {
+		if(this.players.has(this.turn) && this.players.get(this.turn).hand.size === 0) {
+			this.finish();
+			return;
+		}
+
 		const keys = [...this.players.keys()];
 		let index = keys.indexOf(this.turn) + (add * this.direction);
 
 		if(index >= keys.length) index -= keys.length;
+		else if(index < 0) index += keys.length;
 		this.turn = keys[index];
 
+		this.players.get(this.turn).hand.update();
 		this.update();
 	}
 
@@ -56,13 +79,16 @@ class Game {
 		this.started = true;
 		this.turn = this.players.keys().next().value;
 
-		this.update();
+		this.ws.broadcast({
+			op: "gameUpdate",
+			game: this
+		});
 	}
 
 	changeFace(card) {
 		this.deck.discard(this.face);
 
-		if(card.category !== "other") this.color = card.category;
+		if(this.face) this.faceHistory.push(this.face);
 		this.face = card;
 
 		this.update();
@@ -78,22 +104,46 @@ class Game {
 	leave(player) {
 		if(this.started) {
 			player.hand.empty();
-			delete player.hand;
+			player.hand = null;
+
+			if(this.turn === player.id) this.nextTurn();
 		}
 
-		delete player.game;
+		player.game = null;
 		this.players.delete(player.id);
+
+		player.send({
+			op: "leave",
+			id: this.id
+		});
 
 		this.update();
 	}
 
 	delete() {
 		data.games.delete(this.id);
+		[...this.players.values()].forEach(player => {
+			player.game = null;
+			player.hand = null;
+		});
+
 		this.ws.broadcast({ op: "deleteGame", id: this.id });
+	}
+
+	emptyDrawStack() {
+		this.players.get(this.turn).hand.draw(this.drawStack);
+		this.drawStack = 0;
+
+		this.nextTurn();
+	}
+
+	chat(content, player) {
+		this.broadcast({ op: "chat", message: { content, player } });
 	}
 
 	toJSON() {
 		const info = {
+			players: [...this.players.values()],
 			id: this.id,
 			started: this.started,
 			name: this.name,
@@ -102,20 +152,13 @@ class Game {
 		};
 
 		if(this.started) {
-			info.players = [...this.players.values()].map(player => ({
-				id: player.id,
-				nickname: player.nickname,
-				cardsLeft: player.hand.size
-			}));
-
+			info.selectedColor = this.selectedColor;
 			info.direction = this.direction;
 			info.turn = this.turn;
-			info.face = info.face && {
-				category: this.face.category,
-				name: this.face.name
-			};
+			info.face = this.face;
 			info.drawStack = this.drawStack;
 			info.category = this.category;
+			info.faceHistory = this.faceHistory;
 		} else {
 			info.players = [...this.players.values()];
 		}

@@ -23,8 +23,17 @@ class Player {
 		this.send({ op: "setGame", game });
 	}
 
+	setNickname(nickname) {
+		this.nickname = nickname;
+		this.update();
+	}
+
 	send(info) {
 		this.wsClient.send(info);
+	}
+
+	chat(content) {
+		this.game.chat(content, this);
 	}
 
 	update() {
@@ -34,7 +43,8 @@ class Player {
 	toJSON() {
 		return {
 			id: this.id,
-			nickname: this.nickname
+			nickname: this.nickname,
+			cardsLeft: this.hand ? this.hand.size : undefined
 		};
 	}
 }

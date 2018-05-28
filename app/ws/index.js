@@ -1,26 +1,38 @@
 const store = require("../store");
+
+const errorHandler = {
+	joinGame: {
+		incorrectPassword() {
+			app.$set(store.errors, "incorrectPassword", true);
+		}
+	}
+};
+
 const handlers = {
 	selfUpdate({ player }) {
-		store.self = {
-			id: player.id,
-			nickname: player.nickname
-		};
+		Object.assign(store.self, player);
 	},
 	gameUpdate({ game }) {
-		if(store.gameData && store.gameData.id === game.id) {
-			store.gameData = game;
-		} else if(!game.started) {
+		if(store.gameData.id && store.gameData.id === game.id) {
+			Object.assign(store.gameData, game);
+		} else {
 			const index = store.games.findIndex(({ id }) => id === game.id);
-			if(!~index) store.games.push(game);
-			else store.games[index] = game;
+			if(game.started) {
+				if(~index) store.games.splice(index, 1);
+			} else if(!~index) {
+				store.games.push(game);
+			} else {
+				app.$set(store.games, index, game);
+			}
 		}
 	},
 	deleteGame({ id }) {
-		if(store.gameData && store.gameData.id === id) {
-			store.gameData = null;
+		if(store.gameData.id && store.gameData.id === id) {
+			store.gameData.reset();
+			store.self.hand = [];
 
 			app.$router.push({ name: "home" });
-		} else if(!store.gameData) {
+		} else if(!store.gameData.id) {
 			const index = store.games.findIndex(game => game.id === id);
 
 			if(!~index) return;
@@ -28,30 +40,40 @@ const handlers = {
 		}
 	},
 	playStatus({ status }) {
-		store.self = Object.assign(store.self, { status });
+		store.self.playStatus = status;
 	},
 	handUpdate({ hand }) {
-		store.self = Object.assign(store.self, { hand });
+		store.self.hand.splice(0, store.self.hand.length, ...hand);
+		store.self.hand.sort((a, b) => a.category === "other" ?
+			1 :
+			b.category === "other" ?
+				-1 :
+				a.category.localeCompare(b.category));
 	},
 	setGame({ game }) {
 		store.games = [];
-		store.gameData = game;
+		Object.assign(store.gameData, game);
+
 		app.$router.push({ name: "game", params: { id: game.id } });
 	},
 	leave({ id }) {
-		if(!store.gameData || store.gameData.id !== id) return;
-		store.gameData = null;
+		if(!store.gameData.id || store.gameData.id !== id) return;
+		store.gameData.reset();
 
 		app.$router.push({ name: "home" });
 	},
-	wrongPassword() {
-		app.$set(store.errors, "incorrectPassword", true);
-	},
-	error({ error }) {
-		console.error(error);
+	error(data) {
+		if(errorHandler[data.errorOP[0]] && errorHandler[data.errorOP[0]][data.errorOP[1]]) {
+			errorHandler[data.errorOP[0]][data.errorOP[1]](data);
+		} else {
+			console.error(data.error);
+		}
 	},
 	gameList({ games }) {
 		store.games.splice(0, store.games.length, ...games);
+	},
+	chat({ message }) {
+		if(store.gameData.id) store.gameData.chat.push(message);
 	}
 };
 

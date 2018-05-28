@@ -9,7 +9,10 @@ server.on("connection", client => {
 	client.server = server;
 
 	const send = client.send.bind(client);
-	client.send = json => send(JSON.stringify(json));
+	client.send = json => {
+		if(client.readyState !== WebSocket.OPEN) return;
+		send(JSON.stringify(json));
+	};
 
 	client.on("message", message => handleMessage(client, message));
 	client.on("close", () => {

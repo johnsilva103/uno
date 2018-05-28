@@ -38,6 +38,21 @@ class Deck {
 		this.shuffle();
 	}
 
+	reset() {
+		this.discardPile = [];
+		this.cards = Object.entries(deck).reduce((cards, [category, value]) => {
+			Object.entries(value).forEach(([times, cardList]) => {
+				for(let i = 0; i < times; i++) {
+					cardList.forEach(card => cards.push(new Card(this.game, category, card)));
+				}
+			});
+
+			return cards;
+		}, []);
+
+		this.shuffle();
+	}
+
 	refreshCards() {
 		this.cards = this.cards.concat(this.discardPile);
 		this.shuffle();
@@ -56,7 +71,7 @@ class Deck {
 
 	handout(players) {
 		[...players.values()]
-			.forEach(player => player.hand.addCards(this.draw(7)));
+			.forEach(player => player.hand.draw(7));
 	}
 
 	draw(count = 1) {

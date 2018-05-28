@@ -4,8 +4,11 @@ pace.start();
 window.$ = require("jquery"); // eslint-disable-line id-length
 require("bootstrap");
 require("popper.js");
-window.ws = require("./ws/index");
+
 
 const { default: Vue } = require("vue");
-const router = require("./router/index")(Vue);
-window.app = new Vue({ router }).$mount("#app");
+
+window.ws = require("./ws/index");
+require("./components/index")(Vue);
+
+window.app = new Vue({ router: require("./router/index")(Vue) }).$mount("#app");
