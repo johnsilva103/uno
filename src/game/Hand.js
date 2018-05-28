@@ -23,7 +23,6 @@ class Hand {
 
 		this.cards.splice(this.cards.indexOf(card), 1);
 		const status = card.play();
-		if(status !== "PICK") this.game.selectedColor = null;
 
 		this.game.chat(`${this.player.nickname} played ${card.readableName}`);
 		this.player.send({ op: "playStatus", status });

@@ -47,6 +47,7 @@ class Card {
 		}
 
 		this.game.changeFace(this);
+		this.game.selectedColor = null;
 		if(~["skip", "reverse"].indexOf(this.name)) {
 			if(this.name === "reverse" && this.game.players.size > 2) this.game.nextTurn();
 
