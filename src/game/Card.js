@@ -7,11 +7,23 @@ class Card {
 	}
 
 	get playable() {
-		return !this.game.face ||
-			this.category === "other" ||
-			this.game.face.category === this.category ||
-			(this.game.face.category === "other" && this.game.selectedColor === this.category) ||
-			this.game.face.name === this.name;
+		if(!this.game.face) {
+			return true;
+		} else if(this.game.face.name === this.name) {
+			return true;
+		} else if(this.game.drawStack) {
+			if(this.game.selectedColor && this.game.selectedColor === this.category && ~this.name.indexOf("draw")) {
+				return true;
+			} else if(this.category === "other" && ~this.name.indexOf("draw")) {
+				return true;
+			}
+		} else if(this.category === "other") {
+			return true;
+		} else if(this.category === this.game.face.category) {
+			return true;
+		}
+
+		return false;
 	}
 
 	get readableName() {
