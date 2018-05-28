@@ -5,8 +5,8 @@
 			<i
 				class="fa float-right"
 				:class="{
-					'fa-volume-up': messageSound !== false,
-					'fa-volume-off': messageSound === false
+					'fa-volume-up': messageSound,
+					'fa-volume-off': !messageSound
 				}"
 				@click="toggleSound()"
 				aria-hidden="true"
@@ -35,7 +35,7 @@ module.exports = {
 	},
 	watch: {
 		chat() {
-			if(this.messageSound) new Audio("/audio/message.mp3").play();
+			if(this.messageSound) new Audio("/static/audio/message.mp3").play();
 
 			const [container] = $(".chat-container").get();
 			if(container.scrollTop + container.clientHeight === container.scrollHeight) {
