@@ -60,7 +60,7 @@ module.exports = {
 </script>
 
 <style lang="scss" scoped>
-.chat-container {
+#chat-container {
 	overflow-y: auto;
 }
 </style>
