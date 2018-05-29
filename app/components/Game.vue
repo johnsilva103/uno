@@ -33,7 +33,7 @@
 			</div>
 		</div>
 
-		<modal ref="chooseColor" closeable="false">
+		<modal ref="chooseColor" :closeable="false">
 			<template slot="header">Choose Color</template>
 
 			<div class="modal-body text-center">

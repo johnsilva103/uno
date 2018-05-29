@@ -26,11 +26,12 @@ module.exports = {
 	data() {
 		return { messageSound: !!localStorage.messageSound };
 	},
-	async created() {
+	async mounted() {
 		await this.$nextTick();
 
 		const container = document.querySelector("#chat-container");
-		container.scrollTop = container.scrollHeight;
+		if(!container) return;
+		else container.scrollTop = container.scrollHeight;
 	},
 	watch: {
 		async chat() {

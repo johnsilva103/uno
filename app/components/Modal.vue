@@ -30,7 +30,12 @@
 
 <script>
 module.exports = {
-	props: { closeable: { default: true } },
+	props: {
+		closeable: {
+			default: true,
+			type: Boolean
+		}
+	},
 	data() {
 		const backdrop = document.createElement("div");
 		backdrop.classList.add("modal-backdrop");

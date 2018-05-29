@@ -8,11 +8,38 @@ const errorHandler = {
 	}
 };
 
+function playSound(file) {
+	new Audio(`/static/audio/${file}.mp3`).play();
+}
+
 const handlers = {
 	selfUpdate({ player }) {
 		Object.assign(store.self, player);
 	},
 	gameUpdate({ game }) {
+		if(!store.gameData.started && game.started) {
+			playSound("deal");
+		} else if(store.gameData.drawStack && !game.drawStack) {
+			playSound("draw");
+		} else if(store.gameData.turn !== game.turn) {
+			if(store.gameData.direction !== game.direction) {
+				playSound("reverse");
+			} else if(~game.face.name.indexOf("skip")) {
+				playSound("skip");
+			} else if(game.players.find(player => player.id === store.gameData.turn).cardsLeft === 1) {
+				playSound("uno");
+			} else if(
+				store.gameData.players.find(player => player.id === store.gameData.turn).cardsLeft + 1 ===
+				game.players.find(player => player.id === store.gameData.turn).cardsLeft
+			) {
+				playSound("draw");
+			} else {
+				playSound("play");
+			}
+		} else if(store.gameData.started && !game.started) {
+			playSound("win");
+		}
+
 		if(store.gameData.id && store.gameData.id === game.id) {
 			Object.assign(store.gameData, game);
 		} else {
