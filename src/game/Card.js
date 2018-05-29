@@ -19,6 +19,8 @@ class Card {
 			}
 		} else if(this.category === "other") {
 			return true;
+		} else if(this.game.selectedColor && this.category === this.game.selectedColor) {
+			return true;
 		} else if(this.category === this.game.face.category) {
 			return true;
 		}

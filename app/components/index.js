@@ -16,6 +16,9 @@ const blocks = [{
 }, {
 	name: "card",
 	file: "Card"
+}, {
+	name: "modal",
+	file: "Modal"
 }];
 
 module.exports = Vue => {

@@ -33,27 +33,22 @@
 			</div>
 		</div>
 
-		<div class="modal fade" id="chooseColor" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Choose Color</h5>
+		<modal ref="chooseColor" closeable="false">
+			<template slot="header">Choose Color</template>
+
+			<div class="modal-body text-center">
+				<div class="color-chooser">
+					<div class="top">
+						<button type="button" title="red" style="background:red;border-top-left-radius:100%" @click="chooseColor('red')"></button>
+						<button type="button" title="green" style="background:green;border-top-right-radius:100%" @click="chooseColor('green')"></button>
 					</div>
-					<div class="modal-body text-center">
-						<div class="color-chooser">
-							<div class="top">
-								<button type="button" title="red" style="background:red;border-top-left-radius:100%" @click="chooseColor('red')"></button>
-								<button type="button" title="green" style="background:green;border-top-right-radius:100%" @click="chooseColor('green')"></button>
-							</div>
-							<div class="bottom">
-								<button type="button" title="yellow" style="background:yellow;border-bottom-left-radius:100%" @click="chooseColor('yellow')"></button>
-								<button type="button" title="blue" style="background:blue;border-bottom-right-radius:100%" @click="chooseColor('blue')"></button>
-							</div>
-						</div>
+					<div class="bottom">
+						<button type="button" title="yellow" style="background:yellow;border-bottom-left-radius:100%" @click="chooseColor('yellow')"></button>
+						<button type="button" title="blue" style="background:blue;border-bottom-right-radius:100%" @click="chooseColor('blue')"></button>
 					</div>
 				</div>
 			</div>
-		</div>
+		</modal>
 	</div>
 </template>
 
@@ -63,7 +58,7 @@ module.exports = {
 	methods: {
 		chooseColor(color) {
 			ws.send({ op: "endTurn", color });
-			$("#chooseColor").modal("hide");
+			this.$refs.chooseColor.close();
 		},
 		play(card) {
 			if(card.playable) {
@@ -79,7 +74,7 @@ module.exports = {
 	},
 	watch: {
 		"self.playStatus": function(newValue) {
-			if(newValue === "PICK") $("#chooseColor").modal("show");
+			if(newValue === "PICK") this.$refs.chooseColor.show();
 		},
 		"gameData.turn": function(newTurn) {
 			if(newTurn !== this.self.id) return;

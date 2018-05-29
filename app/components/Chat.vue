@@ -11,7 +11,7 @@
 			</button>
 			<h4>Live Chat</h4>
 		</div>
-		<div class="container chat-container" :style="`height:${height || 300}px`">
+		<div class="container" id="chat-container" :style="`height:${height || 300}px`">
 			<message v-for="(message, i) in chat" :key="i" :message="message" />
 		</div>
 		<div class="container">
@@ -26,19 +26,20 @@ module.exports = {
 	data() {
 		return { messageSound: !!localStorage.messageSound };
 	},
-	created() {
-		this.$nextTick(() => {
-			const [container] = $(".chat-container").get();
-			container.scrollTop = container.scrollHeight;
-		});
+	async created() {
+		await this.$nextTick();
+
+		const container = document.querySelector("#chat-container");
+		container.scrollTop = container.scrollHeight;
 	},
 	watch: {
-		chat() {
+		async chat() {
 			if(this.messageSound) new Audio("/static/audio/message.mp3").play();
 
-			const [container] = $(".chat-container").get();
+			const container = document.querySelector("#chat-container");
 			if(container.scrollTop + container.clientHeight === container.scrollHeight) {
-				this.$nextTick(() => container.scrollTop = container.scrollHeight);
+				await this.$nextTick();
+				container.scrollTop = container.scrollHeight;
 			}
 		}
 	},
@@ -46,11 +47,9 @@ module.exports = {
 		send(event) {
 			if(event.shiftKey) return;
 
-			const target = $(event.target);
-			if(!target.val().trim()) return;
-
-			ws.send({ op: "chat", content: target.val() });
-			target.val("");
+			if(!event.target.value.trim()) return;
+			ws.send({ op: "chat", content: event.target.value.trim() });
+			event.target.value = "";
 		},
 		toggleSound() {
 			this.messageSound = !this.messageSound;

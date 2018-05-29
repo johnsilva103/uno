@@ -1,11 +1,6 @@
 const pace = require("pace-progress");
 pace.start();
 
-window.$ = require("jquery"); // eslint-disable-line id-length
-require("bootstrap");
-require("popper.js");
-
-
 const { default: Vue } = require("vue");
 
 window.ws = require("./ws/index");

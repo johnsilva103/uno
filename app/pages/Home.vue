@@ -5,7 +5,7 @@
 		</div>
 		<div class="row">
 			<div class="col-sm-12 col-md-6 col-lg-3">
-				<div class="card" data-toggle="modal" data-target="#createGame">
+				<div class="card" @click="$refs.createGame.show()">
 					<div class="card-body">
 						<h5 class="card-title">Create Room</h5>
 						<p class="card-text">Create a Uno room to play with your friends</p>
@@ -30,77 +30,44 @@
 			</div>
 		</div>
 
-		<div class="modal fade" id="setNickname" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Nickname</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="form-group">
-							<input type="text" class="form-control" placeholder="John Appleseed" v-model.trim="nickname" />
-							<small class="form-text text-danger" v-if="!nickname || nickname.length < 2 || nickname.length > 32">Must be between 2 characters and 32 characters long</small>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-success" data-dismiss="modal" @click="updateNickname()" :disabled="!nickname || nickname.length < 2 || nickname.length > 32">Done</button>
-					</div>
-				</div>
-			</div>
-		</div>
+		<modal ref="setNickname">
+			<template slot="header">Nickname</template>
 
-		<div class="modal fade" id="gamePassword" tabindex="-1" role="dialog" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Game Password</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="form-group">
-							<input type="password" class="form-control" v-model.trim="password.value" />
-							<small class="form-text text-danger" v-if="errors.incorrectPassword">Incorrect Password</small>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-success" @click="joinGame()" :disabled="!password.value">Join</button>
-					</div>
-				</div>
+			<div class="form-group">
+				<input type="text" class="form-control" placeholder="John Appleseed" v-model.trim="nickname" />
+				<small class="form-text text-danger" v-if="!nickname || nickname.length < 2 || nickname.length > 32">Must be between 2 characters and 32 characters long</small>
 			</div>
-		</div>
 
-		<div class="modal fade" id="createGame" tabindex="-1" role="dialog" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Create Game</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="form-group">
-							<label for="name">Name</label>
-							<input type="text" class="form-control" id="name" v-model.trim="gameOptions.name" />
-							<small class="form-text text-danger" v-if="gameOptions.name > 32">Game name cannot be longer than 32 characters</small>
-						</div>
-						<div class="form-group">
-							<label for="password">Password (optional)</label>
-							<input type="text" class="form-control" id="password" v-model.trim="gameOptions.password" autocomplete="off" />
-							<small class="form-text text-danger" v-if="gameOptions.password > 32">Game password cannot be longer than 32 characters</small>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-primary" data-dismiss="modal" @click="createGame()">Create</button>
-					</div>
-				</div>
+			<button slot="footer" type="button" class="btn btn-success" data-dismiss @click="updateNickname()" :disabled="!nickname || nickname.length < 2 || nickname.length > 32">Done</button>
+		</modal>
+
+		<modal ref="gamePassword">
+			<template slot="header">Game Password</template>
+
+			<div class="form-group">
+				<input type="password" class="form-control" v-model.trim="password.value" />
+				<small class="form-text text-danger" v-if="errors.incorrectPassword">Incorrect Password</small>
 			</div>
-		</div>
+
+			<button slot="footer" type="button" class="btn btn-success" @click="joinGame()" :disabled="!password.value">Join</button>
+		</modal>
+
+		<modal ref="createGame">
+			<template slot="header">Create Game</template>
+
+			<div class="form-group">
+				<label for="name">Name</label>
+				<input type="text" class="form-control" id="name" v-model.trim="gameOptions.name" />
+				<small class="form-text text-danger" v-if="gameOptions.name > 32">Game name cannot be longer than 32 characters</small>
+			</div>
+			<div class="form-group">
+				<label for="password">Password (optional)</label>
+				<input type="text" class="form-control" id="password" v-model.trim="gameOptions.password" autocomplete="off" />
+				<small class="form-text text-danger" v-if="gameOptions.password > 32">Game password cannot be longer than 32 characters</small>
+			</div>
+
+			<button slot="footer" type="button" class="btn btn-primary" data-dismiss @click="createGame()">Create</button>
+		</modal>
 	</div>
 </template>
 
@@ -133,11 +100,18 @@ module.exports = {
 			password: {}
 		}, require("../store"));
 	},
-	created() {
-		if(localStorage.nickname) this.updateNickname();
-		else this.$nextTick(() => $("#setNickname").modal("show"));
+	async created() {
+		if(localStorage.nickname) {
+			this.updateNickname();
+		} else {
+			await this.$nextTick();
+			this.$refs.setNickname.show();
+		}
 
 		ws.send({ op: "getGames" });
+	},
+	destroyed() {
+		this.$delete(this.errors, "incorrectPassword");
 	},
 	methods: {
 		updateNickname() {
@@ -160,8 +134,8 @@ module.exports = {
 					incorret: false,
 					game
 				};
-			} else if(game.password && !$("#gamePassword").hasClass("show")) {
-				$("#gamePassword").modal("show");
+			} else if(game.password && !this.$refs.gamePassword.shown) {
+				this.$refs.gamePassword.show();
 			} else {
 				ws.send({ op: "joinGame", id: game.id, password: this.password && this.password.value });
 			}
