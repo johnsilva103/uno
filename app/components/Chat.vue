@@ -24,7 +24,7 @@
 module.exports = {
 	props: ["chat", "height"],
 	data() {
-		return { messageSound: !!localStorage.messageSound };
+		return { messageSound: localStorage.messageSound !== false };
 	},
 	async mounted() {
 		await this.$nextTick();
