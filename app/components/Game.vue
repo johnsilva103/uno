@@ -78,7 +78,7 @@ module.exports = {
 		},
 		"gameData.turn": function(newTurn) {
 			if(newTurn !== this.self.id) return;
-			if(this.gameData.drawStack && !this.self.hand.some(card => ~card.name.indexOf("draw"))) {
+			if(this.gameData.drawStack && !this.self.hand.some(card => card.playable)) {
 				ws.send({ op: "endTurn" });
 			}
 		}

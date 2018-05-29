@@ -23,7 +23,7 @@ const handlers = {
 			} else if(store.gameData.drawStack && !game.drawStack) {
 				playSound("draw");
 			} else if(store.gameData.turn !== game.turn) {
-				const played = store.gameData.face.name;
+				const played = game.face.name;
 				const prevCount = store.gameData.players.find(player => player.id === store.gameData.turn).cardsLeft;
 				const newCount = game.players.find(player => player.id === store.gameData.turn).cardsLeft;
 
@@ -33,7 +33,7 @@ const handlers = {
 				else if(~played.indexOf("skip")) playSound("skip");
 				else playSound("play");
 			}
-		} else if(store.gameData.started) {
+		} else if(store.gameData.started && game.players.length > 1) {
 			playSound("win");
 		}
 

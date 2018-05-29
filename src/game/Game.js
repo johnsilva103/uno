@@ -55,7 +55,7 @@ class Game {
 		this.nextTurn(2);
 	}
 
-	nextTurn(add = 1) {
+	async nextTurn(add = 1) {
 		if(
 			this.players.has(this.turn) &&
 			this.players.get(this.turn).hand &&
@@ -73,7 +73,9 @@ class Game {
 		else if(index < 0) index += keys.length;
 		this.turn = keys[index];
 
+		await new Promise(resolve => process.nextTick(resolve));
 		this.players.get(this.turn).hand.update();
+		await new Promise(resolve => process.nextTick(resolve));
 		this.update();
 	}
 
@@ -107,15 +109,21 @@ class Game {
 	}
 
 	leave(player) {
+		player.game = null;
+		this.players.delete(player.id);
+
 		if(this.started) {
 			player.hand.empty();
 			player.hand = null;
 
 			if(this.turn === player.id) this.nextTurn();
+			if(this.players.size === 1) {
+				this.chat("Game ended. Requires 2+ players.");
+				this.finish();
+				return;
+			}
 		}
 
-		player.game = null;
-		this.players.delete(player.id);
 
 		player.send({
 			op: "leave",
