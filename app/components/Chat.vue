@@ -35,7 +35,11 @@ module.exports = {
 	},
 	watch: {
 		async chat() {
-			if(this.messageSound) new Audio("/static/audio/message.mp3").play();
+			if(this.messageSound) {
+				const sound = new Audio("/static/audio/message.mp3");
+				sound.volume = 0.25;
+				sound.play();
+			}
 
 			const container = document.querySelector("#chat-container");
 			if(container.scrollTop + container.clientHeight === container.scrollHeight) {

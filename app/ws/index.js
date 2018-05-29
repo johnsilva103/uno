@@ -17,26 +17,23 @@ const handlers = {
 		Object.assign(store.self, player);
 	},
 	gameUpdate({ game }) {
-		if(!store.gameData.started && game.started) {
-			playSound("deal");
-		} else if(store.gameData.drawStack && !game.drawStack) {
-			playSound("draw");
-		} else if(store.gameData.turn !== game.turn) {
-			if(store.gameData.direction !== game.direction) {
-				playSound("reverse");
-			} else if(~game.face.name.indexOf("skip")) {
-				playSound("skip");
-			} else if(game.players.find(player => player.id === store.gameData.turn).cardsLeft === 1) {
-				playSound("uno");
-			} else if(
-				store.gameData.players.find(player => player.id === store.gameData.turn).cardsLeft + 1 ===
-				game.players.find(player => player.id === store.gameData.turn).cardsLeft
-			) {
+		if(game.started) {
+			if(!store.gameData.started) {
+				playSound("deal");
+			} else if(store.gameData.drawStack && !game.drawStack) {
 				playSound("draw");
-			} else {
-				playSound("play");
+			} else if(store.gameData.turn !== game.turn) {
+				const played = store.gameData.face.name;
+				const prevCount = store.gameData.players.find(player => player.id === store.gameData.turn).cardsLeft;
+				const newCount = game.players.find(player => player.id === store.gameData.turn).cardsLeft;
+
+				if(~played.indexOf("reverse")) playSound("reverse");
+				else if(~played.indexOf("skip")) playSound("skip");
+				else if(newCount === 1) playSound("uno");
+				else if(prevCount + 1 === newCount) playSound("draw");
+				else playSound("play");
 			}
-		} else if(store.gameData.started && !game.started) {
+		} else if(store.gameData.started) {
 			playSound("win");
 		}
 
