@@ -27,10 +27,10 @@ const handlers = {
 				const prevCount = store.gameData.players.find(player => player.id === store.gameData.turn).cardsLeft;
 				const newCount = game.players.find(player => player.id === store.gameData.turn).cardsLeft;
 
-				if(~played.indexOf("reverse")) playSound("reverse");
-				else if(~played.indexOf("skip")) playSound("skip");
-				else if(newCount === 1) playSound("uno");
+				if(newCount === 1) playSound("uno");
 				else if(prevCount + 1 === newCount) playSound("draw");
+				else if(~played.indexOf("reverse")) playSound("reverse");
+				else if(~played.indexOf("skip")) playSound("skip");
 				else playSound("play");
 			}
 		} else if(store.gameData.started) {
