@@ -130,6 +130,9 @@ ws.onmessage = ({ data: message }) => {
 	handlers[message.op](message);
 };
 
-ws.onclose = () => window.location.reload();
+ws.onclose = () => {
+	app.ref("disconnectedModal").show();
+	setTimeout(() => window.location.reload(), 2500);
+};
 
 module.exports = ws;

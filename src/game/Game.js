@@ -108,7 +108,7 @@ class Game {
 		this.update();
 	}
 
-	leave(player) {
+	async leave(player) {
 		player.game = null;
 		this.players.delete(player.id);
 
@@ -130,6 +130,7 @@ class Game {
 			id: this.id
 		});
 
+		await new Promise(resolve => process.nextTick(resolve));
 		this.update();
 	}
 

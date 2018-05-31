@@ -1,5 +1,5 @@
 <template>
-	<div class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" :class="{ show: shown }" @keydown.esc="close()">
+	<div class="modal fade" role="dialog" aria-hidden="true" :class="{ show: shown }" @keydown.esc="close()">
 		<div class="modal-dialog modal-dialog-centered" role="document">
 			<div class="modal-content">
 				<div class="modal-header">
@@ -46,7 +46,7 @@ module.exports = {
 			shown: false
 		};
 	},
-	async created() {
+	async mounted() {
 		await this.$nextTick();
 
 		if(this.closeable) {
@@ -64,6 +64,7 @@ module.exports = {
 			if(this.shown) return;
 
 			this.shown = true;
+			if(this.$el.querySelector("[autofocus]")) this.$el.querySelector("[autofocus]").focus();
 			this.animate("show");
 		},
 		close() {

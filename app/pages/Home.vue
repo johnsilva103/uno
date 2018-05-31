@@ -1,11 +1,8 @@
 <template>
 	<div>
-		<div class="container-fluid">
-			<h5>{{ self.nickname }}</h5>
-		</div>
 		<div class="row">
 			<div class="col-sm-12 col-md-6 col-lg-3">
-				<div class="card" @click="$refs.createGame.show()">
+				<div class="card" @click="$refs.createModal.show()">
 					<div class="card-body">
 						<h5 class="card-title">Create Room</h5>
 						<p class="card-text">Create a Uno room to play with your friends</p>
@@ -30,40 +27,29 @@
 			</div>
 		</div>
 
-		<modal ref="setNickname">
-			<template slot="header">Nickname</template>
-
-			<div class="form-group">
-				<input type="text" class="form-control" placeholder="John Appleseed" v-model.trim="nickname" />
-				<small class="form-text text-danger" v-if="!nickname || nickname.length < 2 || nickname.length > 32">Must be between 2 characters and 32 characters long</small>
-			</div>
-
-			<button slot="footer" type="button" class="btn btn-success" data-dismiss @click="updateNickname()" :disabled="!nickname || nickname.length < 2 || nickname.length > 32">Done</button>
-		</modal>
-
-		<modal ref="gamePassword">
+		<modal ref="passwordModal">
 			<template slot="header">Game Password</template>
 
 			<div class="form-group">
-				<input type="password" class="form-control" v-model.trim="password.value" />
+				<input type="password" class="form-control" v-model.trim="password.value" autofocus />
 				<small class="form-text text-danger" v-if="errors.incorrectPassword">Incorrect Password</small>
 			</div>
 
 			<button slot="footer" type="button" class="btn btn-success" @click="joinGame()" :disabled="!password.value">Join</button>
 		</modal>
 
-		<modal ref="createGame">
+		<modal ref="createModal">
 			<template slot="header">Create Game</template>
 
 			<div class="form-group">
 				<label for="name">Name</label>
-				<input type="text" class="form-control" id="name" v-model.trim="gameOptions.name" />
-				<small class="form-text text-danger" v-if="gameOptions.name > 32">Game name cannot be longer than 32 characters</small>
+				<input type="text" class="form-control" id="name" v-model.trim="gameOptions.name" autofocus />
+				<small class="form-text text-danger" v-if="gameOptions.name.length > 32">Game name cannot be longer than 32 characters</small>
 			</div>
 			<div class="form-group">
 				<label for="password">Password (optional)</label>
 				<input type="text" class="form-control" id="password" v-model.trim="gameOptions.password" autocomplete="off" />
-				<small class="form-text text-danger" v-if="gameOptions.password > 32">Game password cannot be longer than 32 characters</small>
+				<small class="form-text text-danger" v-if="gameOptions.password.length > 32">Game password cannot be longer than 32 characters</small>
 			</div>
 
 			<button slot="footer" type="button" class="btn btn-primary" data-dismiss @click="createGame()">Create</button>
@@ -95,38 +81,26 @@
 module.exports = {
 	data() {
 		return Object.assign({
-			gameOptions: {},
-			nickname: localStorage.nickname,
+			gameOptions: {
+				name: `${localStorage.nickname}'s game`,
+				password: ""
+			},
 			password: {}
 		}, require("../store"));
 	},
 	async created() {
-		if(localStorage.nickname) {
-			this.updateNickname();
-		} else {
-			await this.$nextTick();
-			this.$refs.setNickname.show();
-		}
-
 		ws.send({ op: "getGames" });
 	},
 	destroyed() {
 		this.$delete(this.errors, "incorrectPassword");
 	},
 	methods: {
-		updateNickname() {
-			if(!this.nickname) return;
-
-			localStorage.nickname = this.nickname;
-			this.gameOptions.name = `${this.nickname}'s game`;
-			ws.send({ op: "nickname", nickname: this.nickname });
-		},
 		createGame() {
 			ws.send({ op: "createGame", name: this.gameOptions.name, password: this.gameOptions.password });
 		},
 		joinGame(game) {
+			if(!game) game = this.password.game;
 			if(game.players.length >= 10) return;
-			else if(!game) game = this.password.game;
 
 			if(game.password && (!this.password.game || this.password.game.id !== game.id)) {
 				this.password = {
@@ -134,11 +108,16 @@ module.exports = {
 					incorret: false,
 					game
 				};
-			} else if(game.password && !this.$refs.gamePassword.shown) {
-				this.$refs.gamePassword.show();
+			} else if(game.password && !this.$refs.passwordModal.shown) {
+				this.$refs.passwordModal.show();
 			} else {
 				ws.send({ op: "joinGame", id: game.id, password: this.password && this.password.value });
 			}
+		}
+	},
+	watch: {
+		"self.nickname": function(nickname) {
+			this.gameOptions.name = `${nickname}'s game`;
 		}
 	}
 };

@@ -3,11 +3,9 @@ module.exports = [{
 	path: "/",
 	component: require("../pages/Home.vue")
 }, {
-
 	name: "game",
 	path: "/game/:id",
 	component: require("../pages/Game.vue")
-
 }, {
 	name: "404",
 	path: "/404",
